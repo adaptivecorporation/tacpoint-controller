@@ -92,7 +92,7 @@ def ep_healthCheck(ep_id):
     print(data)
     ep_hostname = data['sysinfo']['hostname']
     x = tacpoint_col.insert_one(data['sysinfo'])
-    task_sel = 'select * from task_list where cluster_id="{0}" and endpoint_id="{1}"'.format(conf.cluster_id, ep_id)
+    task_sel = 'select * from task_list where cluster_id="{0}" and endpoint_id="{1}" and is_notified=0'.format(conf.cluster_id, ep_id)
     update_query = 'update endpoints set endpoint_hostname="{0}", last_connection="{1}", document_id="{2}"'.format(ep_hostname, data['timestamp'], x.inserted_id)
     try:
         cur = con.cursor()

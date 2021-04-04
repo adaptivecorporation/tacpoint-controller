@@ -52,7 +52,11 @@ def endpoint_join():
     try:
         cur = con.cursor()
         row_count = cur.execute(sel_query)
-        cur.execute(query)
+        print(row_count)
+        if row_count == 0:
+            cur.execute(query)
+        else:
+            cur.execute(update_query)
         con.commit()
         cur.close()
 
@@ -96,6 +100,10 @@ def ep_healthCheck(ep_id):
         con.commit()
         cur.execute(task_sel)
         res = cur.fetchall()
+        for result in res:
+            del_task = 'remove from task_list where cluster_id="{0}" and task_id="{0}"'.format(conf.cluster_id, res['task_id'])
+            cur.execute(del_task)
+        con.commit()
         cur.close()
     except Exception as error:
         print(error)

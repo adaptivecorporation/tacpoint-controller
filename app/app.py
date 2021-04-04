@@ -92,7 +92,7 @@ def ep_healthCheck(ep_id):
     print(data)
     ep_hostname = data['sysinfo']['hostname']
     x = tacpoint_col.insert_one(data['sysinfo'])
-    task_sel = 'select * from task_list where cluster_id="{0}" and endpoint_id="{1}" and is_notified=0'.format(conf.cluster_id, ep_id)
+    task_sel = 'select * from task_list where cluster_id="{0}" and endpoint_id="{1}" and ep_notified=0'.format(conf.cluster_id, ep_id)
     update_query = 'update endpoints set endpoint_hostname="{0}", last_connection="{1}", document_id="{2}"'.format(ep_hostname, data['timestamp'], x.inserted_id)
     try:
         cur = con.cursor()
@@ -101,8 +101,8 @@ def ep_healthCheck(ep_id):
         cur.execute(task_sel)
         res = cur.fetchall()
         for result in res:
-            del_task = 'update task_list set is_notified=1 where task_id="{0}" and cluster_id="{1}"'.format(rec['task_id'], conf.cluster_id)
-            cur.execute(del_task)
+            update_notified = 'update task_list set ep_notified=1 where task_id="{0}" and cluster_id="{1}"'.format(result['task_id'], conf.cluster_id)
+            cur.execute(update_notified)
         con.commit()
         cur.close()
     except Exception as error:

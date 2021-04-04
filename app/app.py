@@ -101,7 +101,7 @@ def ep_healthCheck(ep_id):
         cur.execute(task_sel)
         res = cur.fetchall()
         for result in res:
-            del_task = 'remove from task_list where cluster_id="{0}" and task_id="{0}"'.format(conf.cluster_id, res['task_id'])
+            del_task = 'update task_list set is_notified=1 where task_id="{0}" and cluster_id="{1}"'.format(rec['task_id'], conf.cluster_id)
             cur.execute(del_task)
         con.commit()
         cur.close()

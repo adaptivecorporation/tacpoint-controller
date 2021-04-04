@@ -12,6 +12,7 @@ import datetime
 from bson.objectid import ObjectId
 from redis import Redis
 from rq import Worker, Queue, Connection
+import os
 mongoclient = pymongo.MongoClient(constants.mongoclient)
 
 tacpoint_db = mongoclient["tacpoint"]

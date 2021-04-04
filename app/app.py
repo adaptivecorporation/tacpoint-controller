@@ -52,7 +52,7 @@ def endpoint_join():
     try:
         cur = con.cursor()
         row_count = cur.execute(sel_query)
-        if row_count == 0:
+        if row_count > 0:
             cur.execute(query)
         else:
             cur.execute(update_query)

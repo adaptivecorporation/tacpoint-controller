@@ -38,6 +38,25 @@ def open_connection():
         print(error)
     return con
 
+@app.route(BASE_URL + 'ep/log/<ep_id>', methods=['PUT'])
+def logging(ep_id):
+    con = open_connection()
+    data = request.get_json()
+    cluster_id = conf.cluster_id
+    log = data['log']
+    query = 'insert into logs (log_id, cluster_id, endpoint_id, log) values ("{0}","{1}","{2}","{3}")'.format(uuid.uuid4(), cluster_id, ep_id, log)
+    try:
+        cur = con.cursor()
+        cur.execute(query)
+        con.commit()
+        cur.close()
+
+    except Exception as error:
+        print(error)
+        return jsonify({'message': 'system error'}),500
+    
+    return jsonify({'message': 'ok'}),200
+
 @app.route(BASE_URL + 'ep/join', methods=['PUT'])
 def endpoint_join():
     con = open_connection()
@@ -104,7 +123,7 @@ def createTask():
     con = open_connection()
     task = data['task']
     target = data['target']
-    query = 'insert into task_list (task_id, cluster_id, endpoint_id, task) values ("{0}","{1}","{2}","{3}"'.format(uuid.uuid4(),conf.cluster_id, target, task)
+    query = 'insert into task_list (task_id, cluster_id, endpoint_id, task) values ("{0}","{1}","{2}","{3}")'.format(uuid.uuid4(),conf.cluster_id, target, task)
     try:
         cur = con.cursor()
         cur.execute(query)
@@ -132,7 +151,9 @@ def ep_healthCheck(ep_id):
         con.commit()
         cur.execute(task_sel)
         res = cur.fetchall()
+        print('tasks>>>>', res)
         for result in res:
+            if cur.execute(task_sel) < 0: return jsonify({'message': 'ok'})
             update_notified = 'update task_list set ep_notified=1 where task_id="{0}" and cluster_id="{1}"'.format(result['task_id'], conf.cluster_id)
             cur.execute(update_notified)
         con.commit()

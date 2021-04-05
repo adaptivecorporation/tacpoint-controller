@@ -84,6 +84,20 @@ def get_EP_SysInfo(ep_id):
     print(resp)
     return jsonify({'sysinfo': resp})
 
+@app.route(BASE_URL + 'api/tasks/list', methods=['GET'])
+def listTasks():
+    con = open_connection()
+    query = 'select * from tasks'
+    try:
+        cur = con.cursor()
+        cur.execute(query)
+        res = cur.fetchall()
+        cur.close()
+    except Exception as error:
+        print(error)
+        return jsonify({"message": "error"})
+    return jsonify({'tasks': res})
+
 @app.route(BASE_URL + 'api/tasks/create', methods=['PUT'])
 def createTask():
     data = request.get_json()

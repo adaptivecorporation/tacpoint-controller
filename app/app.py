@@ -84,6 +84,24 @@ def get_EP_SysInfo(ep_id):
     print(resp)
     return jsonify({'sysinfo': resp})
 
+@app.route(BASE_URL + 'api/tasks/create', methods=['PUT'])
+def createTask():
+    data = request.get_json()
+    con = open_connection()
+    task = data['task']
+    target = data['target']
+    query = 'insert into task_list (task_id, cluster_id, endpoint_id, task) values ("{0}","{1}","{2}","{3}"'.format(uuid.uuid4(),conf.cluster_id, target, task)
+    try:
+        cur = con.cursor()
+        cur.execute(query)
+        con.commit()
+        cur.close()
+
+    except Exception as error:
+        print(error)
+        return jsonify({'message':'server error'}),500
+    return jsonify({'message': 'task created', 'target': target})
+
 
 @app.route(BASE_URL + 'ep/healthcheck/<ep_id>', methods=['PUT'])
 def ep_healthCheck(ep_id):

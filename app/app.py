@@ -66,7 +66,7 @@ def endpoint_join():
     x = tacpoint_col.insert_one(data['sysinfo'])
     sel_query = 'select * from endpoints where endpoint_id="{0}" and cluster_id="{1}"'.format(data['endpoint_id'], conf.cluster_id)
     query = 'insert into endpoints (endpoint_id, cluster_id, endpoint_hostname, last_connection, document_id) values ("{0}","{1}","{2}","{3}","{4}")'.format(data['endpoint_id'], conf.cluster_id, ep_hostname, data['timestamp'], x.inserted_id)
-    update_query = 'update endpoints set endpoint_hostname="{0}", last_connection="{1}", document_id="{2}"'.format(ep_hostname, data['timestamp'], x.inserted_id)
+    update_query = 'update endpoints set endpoint_hostname="{0}", last_connection="{1}", document_id="{2}" where endpoint_id="{3}"'.format(ep_hostname, data['timestamp'], x.inserted_id, data['endpoint_id'])
     print(x.inserted_id)
     try:
         cur = con.cursor()

@@ -113,10 +113,17 @@ def ep_healthCheck(ep_id):
         return jsonify({'message': 'server error'}),500
     return jsonify({'message': 'ok', 'tasks': res}),200
 
-@app.route(BASE_URL + "cluster/join/<cluster_id>", methods=['PUT'])
-def cluster_join():
+@app.route(BASE_URL + "cluster/uri/<cluster_id>", methods=['GET'])
+def cluster_join(cluster_id):
     con = open_connection()
     query = 'select * from clusters where cluster_id="{0}"'.format(cluster_id)
+    try:
+        cur = con.cursor()
+        cur.execute(query)
+        res = cur.fetchall()
+
+    except Exception as error:
+        print(error)
     host = res[0]['cluster_host'] + ':' + str(res[0]['cluster_port'])
     uri = 'https://'+ host + '/v1/ep/join'
     return jsonify({'uri': uri})

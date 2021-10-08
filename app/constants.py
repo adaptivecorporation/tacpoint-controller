@@ -1,5 +1,5 @@
-DB_HOST = "10.10.10.203"
+DB_HOST = ""
 DB_USER = "tacpoint-sql"
-DB_PASSWORD = "adaptive123!"
+DB_PASSWORD = ""
 DB_NAME = "tacpoint"
-mongoclient = "mongodb://10.10.10.203:27017/"
+mongoclient = "mongodb://:27017/"

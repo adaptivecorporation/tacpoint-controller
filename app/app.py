@@ -13,10 +13,15 @@ from bson.objectid import ObjectId
 from redis import Redis
 from rq import Worker, Queue, Connection
 import os
+from pymysql.converters import escape_string
+import json
 mongoclient = pymongo.MongoClient(constants.mongoclient)
 
 tacpoint_db = mongoclient["tacpoint"]
 tacpoint_col = tacpoint_db[conf.cluster_id]
+
+tacpoint_id_db = mongoclient["tacpoint-id"]
+tacpoint_id_col = tacpoint_db["tacpoint-id"]
 
 app = Flask(__name__)
 api = Api(app)
@@ -112,6 +117,42 @@ def ep_healthCheck(ep_id):
         print(error)
         return jsonify({'message': 'server error'}),500
     return jsonify({'message': 'ok', 'tasks': res}),200
+
+@app.route(BASE_URL + "id/dump/sysinfo", methods=['PUT'])
+def get_dump_sysInfo():
+    con = open_connection()
+    data = request.get_json()
+    sysinfo = json.dumps(data['sysinfo'])
+    esc_str = escape_string(sysinfo)
+    q = 'update intrusion set sysinfo="{0}" where hostname="{1}"'.format(esc_str, data['hostname'])
+    try:
+        cur = con.cursor()
+        cur.execute(q)
+        con.commit()
+        cur.close()
+
+    except Exception as error:
+        print(error)
+        return jsonify({'message': 'server error'})
+    return jsonify({'message': 'ok'}),200
+
+@app.route(BASE_URL + "id/dump/proc", methods=['PUT'])
+def get_dump_proc():
+    con = open_connection()
+    data = request.get_json()
+    procs = json.dumps(data['processes'])
+    esc_str = escape_string(procs)
+    q = 'update intrusion set procs="{0}" where hostname="{1}"'.format(esc_str, data['hostname'])
+    try:
+        cur = con.cursor()
+        cur.execute(q)
+        con.commit()
+        cur.close()
+
+    except Exception as error:
+        print(error)
+        return jsonify({'message': 'server error'})
+    return jsonify({'message': 'ok'}),200
 
 
 
